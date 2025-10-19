@@ -1,0 +1,593 @@
+﻿@model s1121735_Final_Project.Models.Songs
+@{
+    ViewData["Title"] = "歌曲詳情 - 我的音樂庫";
+}
+
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --accent-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --card-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            --glass-bg: rgba(255, 255, 255, 0.25);
+            --glass-border: rgba(255, 255, 255, 0.18);
+            --label-gradient: linear-gradient(135deg, #e6f3ff 0%, #ffffff 100%);
+        }
+
+        body {
+            background: var(--primary-gradient);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+        }
+
+            /* 動態背景 */
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+                z-index: -1;
+                animation: float 20s ease-in-out infinite;
+            }
+
+        @@keyframes float {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+
+            33% {
+                transform: translateY(-10px) rotate(1deg);
+            }
+
+            66% {
+                transform: translateY(5px) rotate(-1deg);
+            }
+        }
+
+        /* 音樂符號動畫 */
+        .music-notes {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .note {
+            position: absolute;
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.1);
+            animation: musicFloat 15s linear infinite;
+        }
+
+        @@keyframes musicFloat {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* 主要容器 */
+        .main-container {
+            padding: 2rem 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+
+        /* 玻璃效果卡片 */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: var(--card-shadow);
+            padding: 1rem 3rem 3rem 3rem;
+            margin: 2rem auto;
+            max-width: 900px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+            .glass-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 30px 60px rgba(0,0,0,0.15);
+            }
+
+            .glass-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 2px;
+                background: var(--primary-gradient);
+            }
+
+        /* 標題樣式 */
+        .page-title {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            background: var(--label-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+            font-size: 2.5rem;
+        }
+
+        .title-icon {
+            display: block;
+            margin: 0 auto 0.5rem auto; /* 圖示單獨一行並置中 */
+            font-size: 3rem;
+            color: white;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @@keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        /* 歌曲封面區域 */
+        .album-cover-section {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .album-cover {
+            width: 200px;
+            height: 200px;
+            border-radius: 20px;
+            object-fit: cover;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+            .album-cover:hover {
+                transform: scale(1.05);
+                box-shadow: 0 20px 45px rgba(0,0,0,0.4);
+            }
+
+        .no-cover {
+            width: 200px;
+            height: 200px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: rgba(255, 255, 255, 0.5);
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            margin: 0 auto;
+        }
+
+        /* 詳情列表樣式 */
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .detail-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+            .detail-item:hover {
+                background: rgba(255, 255, 255, 0.15);
+                transform: translateY(-2px);
+            }
+
+        .detail-label {
+            color: #e6f3ff;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .label-icon {
+            color: white;
+            font-size: 1rem;
+        }
+
+        .detail-value {
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 500;
+            word-break: break-all;
+        }
+
+        /* 特殊項目樣式 */
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        /* 按鈕樣式 */
+        .btn-container {
+            text-align: center;
+            margin-top: 2rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-music {
+            background: var(--primary-gradient);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+            .btn-music:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+                color: white;
+                text-decoration: none;
+            }
+
+            .btn-music::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+                transition: left 0.5s;
+            }
+
+            .btn-music:hover::before {
+                left: 100%;
+            }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+            .btn-secondary:hover {
+                background: rgba(255, 255, 255, 0.3);
+                color: white;
+                text-decoration: none;
+                transform: translateY(-2px);
+            }
+
+        /* 響應式設計 */
+        @@media (max-width: 768px) {
+            .glass-card {
+                margin: 1rem;
+                padding: 2rem 1.5rem;
+            }
+
+            .page-title {
+                font-size: 2rem;
+                flex-direction: column;
+            }
+
+            .details-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .btn-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .album-cover,
+            .no-cover {
+                width: 150px;
+                height: 150px;
+            }
+        }
+
+        /* 載入動畫 */
+        .fade-in {
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 成功訊息 */
+        .success-message {
+            background: rgba(46, 204, 113, 0.1);
+            border: 1px solid rgba(46, 204, 113, 0.3);
+            color: #2ecc71;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        /* 時長格式化 */
+        .duration-display {
+            font-family: 'Courier New', monospace;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        /* URL 顯示 */
+        .url-display {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <!-- 音樂符號背景動畫 -->
+    <div class="music-notes">
+        <div class="note" style="left: 10%; animation-delay: 0s;">♪</div>
+        <div class="note" style="left: 20%; animation-delay: 2s;">♫</div>
+        <div class="note" style="left: 30%; animation-delay: 4s;">♪</div>
+        <div class="note" style="left: 40%; animation-delay: 6s;">♬</div>
+        <div class="note" style="left: 50%; animation-delay: 8s;">♪</div>
+        <div class="note" style="left: 60%; animation-delay: 10s;">♫</div>
+        <div class="note" style="left: 70%; animation-delay: 12s;">♪</div>
+        <div class="note" style="left: 80%; animation-delay: 14s;">♬</div>
+        <div class="note" style="left: 90%; animation-delay: 16s;">♪</div>
+    </div>
+
+    <div class="main-container">
+        <div class="container">
+            <div class="glass-card fade-in">
+                <!-- 頁面標題 -->
+                <h1 class="page-title">
+                    <i class="fas fa-music title-icon"></i>
+                    歌曲詳情
+                </h1>
+                <p class="subtitle">
+                    <i class="fas fa-info-circle"></i>
+                    查看完整的歌曲資訊
+                </p>
+
+                @* <!-- 成功/錯誤訊息 --> *@
+                @* @if (TempData["message"] != null) *@
+                @* { *@
+                @*     <div class="success-message"> *@
+                @*         <i class="fas fa-check-circle"></i> *@
+                @*         @TempData["message"] *@
+                @*     </div> *@
+                @* } *@
+
+                <!-- 專輯封面 -->
+                <div class="album-cover-section">
+                    @if (!string.IsNullOrEmpty(Model?.ImageUrl))
+                    {
+                        <img src="/images/@Model.ImageUrl" alt="@Model.Title 專輯封面" class="album-cover"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                        <div class="no-cover" style="display: none;">
+                            <i class="fas fa-music"></i>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="no-cover">
+                            <i class="fas fa-music"></i>
+                        </div>
+                    }
+                </div>
+
+                <!-- 歌曲詳細資訊 -->
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">
+                            <i class="fas fa-music label-icon"></i>
+                            歌曲名稱
+                        </div>
+                        <div class="detail-value">@Html.DisplayFor(model => model.Title)</div>
+                    </div>
+
+                    <div class="detail-item">
+                        <div class="detail-label">
+                            <i class="fas fa-microphone label-icon"></i>
+                            演唱者/藝人
+                        </div>
+                        <div class="detail-value">@Html.DisplayFor(model => model.Artist)</div>
+                    </div>
+
+                    <div class="detail-item">
+                        <div class="detail-label">
+                            <i class="fas fa-compact-disc label-icon"></i>
+                            專輯名稱
+                        </div>
+                        <div class="detail-value">@Html.DisplayFor(model => model.Album)</div>
+                    </div>
+
+                    <div class="detail-item">
+                        <div class="detail-label">
+                            <i class="fas fa-tags label-icon"></i>
+                            音樂類型
+                        </div>
+                        <div class="detail-value">@Html.DisplayFor(model => model.Genre)</div>
+                    </div>
+
+                    <div class="detail-item">
+                        <div class="detail-label">
+                            <i class="fas fa-clock label-icon"></i>
+                            播放時長
+                        </div>
+                        <div class="detail-value">
+                            <span class="duration-display" id="duration">@Html.DisplayFor(model => model.Duration) 秒</span>
+                        </div>
+                    </div>
+
+                    <div class="detail-item">
+                        <div class="detail-label">
+                            <i class="fas fa-calendar-alt label-icon"></i>
+                            發行年份
+                        </div>
+                        <div class="detail-value">@Html.DisplayFor(model => model.ReleaseYear)</div>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model?.ImageUrl))
+                    {
+                        <div class="detail-item full-width">
+                            <div class="detail-label">
+                                <i class="fas fa-image label-icon"></i>
+                                專輯封面網址
+                            </div>
+                            <div class="detail-value url-display">@Html.DisplayFor(model => model.ImageUrl)</div>
+                        </div>
+                    }
+
+                    <div class="detail-item full-width">
+                        <div class="detail-label">
+                            <i class="fas fa-plus-circle label-icon"></i>
+                            加入日期
+                        </div>
+                        <div class="detail-value">@Html.DisplayFor(model => model.CreatedDate)</div>
+                    </div>
+                </div>
+
+                <!-- 按鈕區域 -->
+                <div class="btn-container">
+                    <a asp-action="Edit" asp-route-id="@Model?.SongID" class="btn-music">
+                        <i class="fas fa-edit"></i>
+                        編輯歌曲
+                    </a>
+                    <a asp-action="Index" class="btn-secondary">
+                        <i class="fas fa-arrow-left"></i>
+                        返回音樂庫
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // 音樂符號動畫隨機化
+        function randomizeNotes() {
+            const notes = document.querySelectorAll('.note');
+            notes.forEach(note => {
+                const randomDelay = Math.random() * 20;
+                note.style.animationDelay = randomDelay + 's';
+                note.style.left = Math.random() * 90 + '%';
+            });
+        }
+
+        // 格式化時長顯示 (秒 -> 分:秒)
+        function formatDuration() {
+            const durationElement = document.getElementById('duration');
+            if (durationElement) {
+                const seconds = parseInt(durationElement.textContent);
+                if (!isNaN(seconds)) {
+                    const minutes = Math.floor(seconds / 60);
+                    const remainingSeconds = seconds % 60;
+                    const formattedTime = `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+                    durationElement.innerHTML = `${formattedTime} <small>(${seconds} 秒)</small>`;
+                }
+            }
+        }
+
+        // 頁面載入完成後執行
+        window.addEventListener('load', function() {
+            randomizeNotes();
+            formatDuration();
+
+            // 每30秒重新隨機化音樂符號位置
+            setInterval(randomizeNotes, 30000);
+        });
+
+        // 專輯封面載入錯誤處理
+        document.addEventListener('DOMContentLoaded', function() {
+            const albumCover = document.querySelector('.album-cover');
+            if (albumCover) {
+                albumCover.addEventListener('error', function() {
+                    this.style.display = 'none';
+                    const noCover = this.nextElementSibling;
+                    if (noCover) {
+                        noCover.style.display = 'flex';
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

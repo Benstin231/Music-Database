@@ -1,0 +1,89 @@
+is_global = true
+build_property.TargetFramework = net8.0
+build_property.TargetFramework = net8.0
+build_property.TargetPlatformMinVersion = 
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = s1121735_Final_Project
+build_property.RootNamespace = s1121735_Final_Project
+build_property.ProjectDir = C:\Users\benst\Desktop\YZU files\ASP.NET\s1121735_Final_Project_b\s1121735_Final_Project\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 8.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = true
+build_property.MSBuildProjectDirectory = C:\Users\benst\Desktop\YZU files\ASP.NET\s1121735_Final_Project_b\s1121735_Final_Project
+build_property._RazorSourceGeneratorDebug = 
+build_property.EffectiveAnalysisLevelStyle = 8.0
+build_property.EnableCodeStyleSeverity = 
+
+[C:/Users/benst/Desktop/YZU files/ASP.NET/s1121735_Final_Project_b/s1121735_Final_Project/Views/DBSongs/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcREJTb25nc1xDcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/benst/Desktop/YZU files/ASP.NET/s1121735_Final_Project_b/s1121735_Final_Project/Views/DBSongs/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcREJTb25nc1xEZWxldGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/benst/Desktop/YZU files/ASP.NET/s1121735_Final_Project_b/s1121735_Final_Project/Views/DBSongs/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcREJTb25nc1xEZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/benst/Desktop/YZU files/ASP.NET/s1121735_Final_Project_b/s1121735_Final_Project/Views/DBSongs/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcREJTb25nc1xFZGl0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/benst/Desktop/YZU files/ASP.NET/s1121735_Final_Project_b/s1121735_Final_Project/Views/DBSongs/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcREJTb25nc1xJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/benst/Desktop/YZU files/ASP.NET/s1121735_Final_Project_b/s1121735_Final_Project/Views/DBSongs/Login.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcREJTb25nc1xMb2dpbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/benst/Desktop/YZU files/ASP.NET/s1121735_Final_Project_b/s1121735_Final_Project/Views/DBSongs/SelectName.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcREJTb25nc1xTZWxlY3ROYW1lLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/benst/Desktop/YZU files/ASP.NET/s1121735_Final_Project_b/s1121735_Final_Project/Views/DBSongs/SelectQuery.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcREJTb25nc1xTZWxlY3RRdWVyeS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/benst/Desktop/YZU files/ASP.NET/s1121735_Final_Project_b/s1121735_Final_Project/Views/Home/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/benst/Desktop/YZU files/ASP.NET/s1121735_Final_Project_b/s1121735_Final_Project/Views/Home/Privacy.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/benst/Desktop/YZU files/ASP.NET/s1121735_Final_Project_b/s1121735_Final_Project/Views/Shared/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/benst/Desktop/YZU files/ASP.NET/s1121735_Final_Project_b/s1121735_Final_Project/Views/Shared/_ValidationScriptsPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/benst/Desktop/YZU files/ASP.NET/s1121735_Final_Project_b/s1121735_Final_Project/Views/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/benst/Desktop/YZU files/ASP.NET/s1121735_Final_Project_b/s1121735_Final_Project/Views/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/benst/Desktop/YZU files/ASP.NET/s1121735_Final_Project_b/s1121735_Final_Project/Views/Shared/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = b-ai7pnwvu4c

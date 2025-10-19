@@ -1,0 +1,601 @@
+﻿@{
+    ViewData["Title"] = "搜尋歌曲 - 我的音樂庫";
+}
+
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+        }
+
+            /* 動態背景效果 */
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+                z-index: -1;
+                animation: float 20s ease-in-out infinite;
+            }
+
+        @@keyframes float {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+
+            33% {
+                transform: translateY(-10px) rotate(1deg);
+            }
+
+            66% {
+                transform: translateY(5px) rotate(-1deg);
+            }
+        }
+
+        /* 音樂符號動畫 */
+        .music-notes {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .note {
+            position: absolute;
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.1);
+            animation: musicFloat 15s linear infinite;
+        }
+
+        @@keyframes musicFloat {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* 主容器 */
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 3rem;
+            margin: 2rem auto;
+            max-width: 800px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+            .main-container::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            }
+
+        /* 頁面標題 */
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .page-title {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .title-icon {
+            display: block;
+            margin: 0 auto 1rem auto;
+            font-size: 3rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @@keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .subtitle {
+            color: #6c757d;
+            font-size: 1.1rem;
+            margin-bottom: 0;
+        }
+
+        /* 搜尋表單樣式 */
+        .search-form {
+            background: white;
+            border-radius: 15px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .form-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #495057;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .label-icon {
+            color: #667eea;
+            font-size: 1.2rem;
+        }
+
+        /* 下拉選單樣式 */
+        .select-container {
+            position: relative;
+        }
+
+        .custom-select {
+            width: 100%;
+            padding: 1rem 3rem 1rem 1.5rem;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 500;
+            background: #f8f9fa;
+            color: #495057;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+        }
+
+            .custom-select:focus {
+                outline: none;
+                border-color: #667eea;
+                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+                background: white;
+            }
+
+            .custom-select:hover {
+                border-color: #667eea;
+                background: white;
+            }
+
+        .select-arrow {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            color: #667eea;
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .select-container:hover .select-arrow {
+            transform: translateY(-50%) rotate(180deg);
+        }
+
+        /* 搜尋提示 */
+        .search-hint {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            color: #495057;
+            font-size: 0.9rem;
+        }
+
+        .hint-icon {
+            color: #667eea;
+            margin-right: 0.5rem;
+        }
+
+        /* 按鈕樣式 */
+        .btn-container {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+
+        .btn-search {
+            background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+            border: none;
+            color: white;
+            padding: 1rem 3rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .btn-search:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(78, 205, 196, 0.4);
+            }
+
+            .btn-search::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+                transition: left 0.5s;
+            }
+
+            .btn-search:hover::before {
+                left: 100%;
+            }
+
+            .btn-search:disabled {
+                opacity: 0.7;
+                cursor: not-allowed;
+                transform: none;
+            }
+
+        .btn-back {
+            background: rgba(108, 117, 125, 0.1);
+            border: 2px solid #6c757d;
+            color: #6c757d;
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+            .btn-back:hover {
+                background: #6c757d;
+                color: white;
+                text-decoration: none;
+                transform: translateY(-2px);
+            }
+
+        /* 統計信息 */
+        .stats-info {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .stats-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .stats-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        /* 響應式設計 */
+        @@media (max-width: 768px) {
+            .main-container {
+                margin: 1rem;
+                padding: 2rem 1.5rem;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .search-form {
+                padding: 1.5rem;
+            }
+
+            .btn-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn-search,
+            .btn-back {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* 載入動畫 */
+        .fade-in {
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 成功/錯誤訊息 */
+        .alert-custom {
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .alert-info {
+            background: linear-gradient(135deg, rgba(23, 162, 184, 0.1) 0%, rgba(23, 162, 184, 0.05) 100%);
+            color: #17a2b8;
+            border-left: 4px solid #17a2b8;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, rgba(40, 167, 69, 0.1) 0%, rgba(40, 167, 69, 0.05) 100%);
+            color: #28a745;
+            border-left: 4px solid #28a745;
+        }
+
+        .alert-warning {
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 193, 7, 0.05) 100%);
+            color: #ffc107;
+            border-left: 4px solid #ffc107;
+        }
+
+        /* 選項計數器 */
+        .option-counter {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        /* 空狀態樣式 */
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: #6c757d;
+        }
+
+            .empty-state i {
+                font-size: 3rem;
+                margin-bottom: 1rem;
+                color: #dee2e6;
+            }
+    </style>
+</head>
+<body>
+    <!-- 音樂符號背景動畫 -->
+    <div class="music-notes">
+        <div class="note" style="left: 10%; animation-delay: 0s;">♪</div>
+        <div class="note" style="left: 20%; animation-delay: 2s;">♫</div>
+        <div class="note" style="left: 30%; animation-delay: 4s;">♪</div>
+        <div class="note" style="left: 40%; animation-delay: 6s;">♬</div>
+        <div class="note" style="left: 50%; animation-delay: 8s;">♪</div>
+        <div class="note" style="left: 60%; animation-delay: 10s;">♫</div>
+        <div class="note" style="left: 70%; animation-delay: 12s;">♪</div>
+        <div class="note" style="left: 80%; animation-delay: 14s;">♬</div>
+        <div class="note" style="left: 90%; animation-delay: 16s;">♪</div>
+    </div>
+
+    <div class="main-container fade-in">
+        <!-- 頁面標題 -->
+        <div class="page-header">
+            <i class="fas fa-search title-icon"></i>
+            <h1 class="page-title">歌曲搜尋</h1>
+            <p class="subtitle">
+                <i class="fas fa-music"></i>
+                從歌曲庫中尋找您喜愛的音樂
+            </p>
+        </div>
+
+        <!-- 統計信息 -->
+        <div class="stats-info">
+            <div class="stats-number" id="totalSongs">@(ViewBag.Mylist?.Count ?? 0)</div>
+            <div class="stats-label">可搜尋的歌曲數量</div>
+        </div>
+
+        @* <!-- 訊息顯示 --> *@
+        @* @if (TempData["message"] != null) *@
+        @* { *@
+        @*     <div class="alert-custom alert-info"> *@
+        @*         <i class="fas fa-info-circle"></i> *@
+        @*         @TempData["message"] *@
+        @*     </div> *@
+        @* } *@
+
+        @if (ViewBag.Mylist != null && ViewBag.Mylist.Count > 0)
+        {
+            <!-- 搜尋提示 -->
+            <div class="search-hint">
+                <i class="fas fa-lightbulb hint-icon"></i>
+                <strong>搜尋提示：</strong>從下拉選單中選擇一首歌曲，系統將為您顯示完整的歌曲資訊。
+            </div>
+
+            <!-- 搜尋表單 -->
+            <form method="post" action="@Url.Action("SelectName")" class="search-form">
+                <div class="form-section">
+                    <label for="fTitle" class="form-label">
+                        <i class="fas fa-music label-icon"></i>
+                        選擇歌曲標題
+                        <span class="option-counter">@ViewBag.Mylist.Count 首歌曲</span>
+                    </label>
+
+                    <div class="select-container">
+                        <select id="fTitle" name="fTitle" class="custom-select" required>
+                            <option value="" disabled selected>請選擇一首歌曲...</option>
+                            @foreach (var item in ViewBag.Mylist)
+                            {
+                                <option value="@item">@item</option>
+                            }
+                        </select>
+                        <i class="fas fa-chevron-down select-arrow"></i>
+                    </div>
+                </div>
+
+                <!-- 按鈕區域 -->
+                <div class="btn-container">
+                    <button type="submit" class="btn-search">
+                        <i class="fas fa-search"></i>
+                        開始搜尋
+                    </button>
+                    <a asp-action="Index" class="btn-back">
+                        <i class="fas fa-arrow-left"></i>
+                        返回音樂庫
+                    </a>
+                </div>
+            </form>
+        }
+        else
+        {
+            <!-- 空狀態 -->
+            <div class="empty-state">
+                <i class="fas fa-music"></i>
+                <h3>目前沒有可搜尋的歌曲</h3>
+                <p>請先新增一些歌曲到您的音樂庫中。</p>
+                <a asp-action="Create" class="btn-search" style="margin-top: 1rem;">
+                    <i class="fas fa-plus"></i>
+                    新增歌曲
+                </a>
+            </div>
+        }
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // 音樂符號動畫隨機化
+        function randomizeNotes() {
+            const notes = document.querySelectorAll('.note');
+            notes.forEach(note => {
+                const randomDelay = Math.random() * 20;
+                note.style.animationDelay = randomDelay + 's';
+                note.style.left = Math.random() * 90 + '%';
+            });
+        }
+
+        // 搜尋表單增強
+        document.addEventListener('DOMContentLoaded', function() {
+            randomizeNotes();
+
+            const selectElement = document.getElementById('fTitle');
+            const searchButton = document.querySelector('.btn-search');
+
+            if (selectElement && searchButton) {
+                // 選擇變更時的回饋
+                selectElement.addEventListener('change', function() {
+                    if (this.value) {
+                        const originalText = searchButton.innerHTML;
+                        searchButton.innerHTML = '<i class="fas fa-search"></i> 搜尋「' + this.value + '」';
+
+                        // 3秒後恢復原始文字
+                        setTimeout(() => {
+                            if (!searchButton.disabled) {
+                                searchButton.innerHTML = '<i class="fas fa-search"></i> 開始搜尋';
+                            }
+                        }, 3000);
+                    }
+                });
+
+                // 表單提交時的載入效果
+                document.querySelector('form').addEventListener('submit', function(e) {
+                    if (!selectElement.value) {
+                        e.preventDefault();
+                        // 使用更友好的提示
+                        selectElement.focus();
+                        selectElement.style.borderColor = '#dc3545';
+
+                        setTimeout(() => {
+                            selectElement.style.borderColor = '#e9ecef';
+                        }, 2000);
+
+                        return false;
+                    }
+
+                    searchButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 搜尋中...';
+                    searchButton.disabled = true;
+                });
+            }
+
+            // 每30秒重新隨機化音樂符號位置
+            setInterval(randomizeNotes, 30000);
+        });
+
+    </script>
+</body>
+</html>

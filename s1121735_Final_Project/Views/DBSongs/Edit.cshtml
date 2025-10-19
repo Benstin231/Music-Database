@@ -1,0 +1,736 @@
+﻿@model s1121735_Final_Project.Models.Songs
+@{
+    ViewData["Title"] = "編輯歌曲 - 我的音樂庫";
+}
+
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --accent-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --card-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            --glass-bg: rgba(255, 255, 255, 0.25);
+            --glass-border: rgba(255, 255, 255, 0.18);
+            --label-gradient: linear-gradient(135deg, #e6f3ff 0%, #ffffff 100%);
+        }
+
+        body {
+            background: var(--primary-gradient);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+        }
+
+            /* 動態背景 */
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+                z-index: -1;
+                animation: float 20s ease-in-out infinite;
+            }
+
+        @@keyframes float {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+
+            33% {
+                transform: translateY(-10px) rotate(1deg);
+            }
+
+            66% {
+                transform: translateY(5px) rotate(-1deg);
+            }
+        }
+
+        /* 音樂符號動畫 */
+        .music-notes {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .note {
+            position: absolute;
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.1);
+            animation: musicFloat 15s linear infinite;
+        }
+
+        @@keyframes musicFloat {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* 主要容器 */
+        .main-container {
+            padding: 2rem 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+
+        /* 玻璃效果卡片 */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: var(--card-shadow);
+            padding: 2rem 3rem 3rem 3rem;
+            margin: 2rem auto;
+            max-width: 700px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+            .glass-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 30px 60px rgba(0,0,0,0.15);
+            }
+
+            .glass-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 2px;
+                background: var(--primary-gradient);
+            }
+
+        /* 標題樣式 */
+        .page-title {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            background: var(--label-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+            font-size: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .title-icon {
+            font-size: 3rem;
+            color: white;
+            animation: pulse 2s ease-in-out infinite;
+            margin-bottom: 0.5rem;
+        }
+
+        @@keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        /* 表單樣式 */
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .form-label {
+            color: #e6f3ff;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .label-icon {
+            color: white;
+        }
+
+        .form-control {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            color: white;
+            padding: 12px 16px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+            .form-control:focus {
+                background: rgba(255, 255, 255, 0.3);
+                border-color: #667eea;
+                box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+                color: white;
+            }
+
+            .form-control::placeholder {
+                color: rgba(255, 255, 255, 0.6);
+            }
+
+        /* 按鈕樣式 */
+        .btn-container {
+            text-align: center;
+            margin-top: 2rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-music {
+            background: var(--primary-gradient);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-width: 150px;
+        }
+
+            .btn-music:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+                color: white;
+            }
+
+            .btn-music::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+                transition: left 0.5s;
+            }
+
+            .btn-music:hover::before {
+                left: 100%;
+            }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+            .btn-secondary:hover {
+                background: rgba(255, 255, 255, 0.3);
+                color: white;
+                text-decoration: none;
+                transform: translateY(-2px);
+            }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+            border: none;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+            .btn-danger:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4);
+                color: white;
+                text-decoration: none;
+            }
+
+        /* 驗證訊息樣式 */
+        .text-danger {
+            color: #ff6b6b !important;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: block;
+        }
+
+        .validation-summary {
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            color: #ff6b6b;
+        }
+
+        /* 響應式設計 */
+        @@media (max-width: 768px) {
+            .glass-card {
+                margin: 1rem;
+                padding: 2rem;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .btn-container {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        /* 載入動畫 */
+        .fade-in {
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 成功訊息 */
+        .success-message {
+            background: rgba(46, 204, 113, 0.1);
+            border: 1px solid rgba(46, 204, 113, 0.3);
+            color: #2ecc71;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        /* 預覽區域 */
+        .preview-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+        }
+
+        .preview-cover {
+            width: 120px;
+            height: 120px;
+            border-radius: 15px;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            margin: 0 auto 1rem auto;
+            display: block;
+        }
+
+        .preview-no-cover {
+            width: 120px;
+            height: 120px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: rgba(255, 255, 255, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            margin: 0 auto 1rem auto;
+        }
+
+        .preview-title {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .preview-artist {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- 音樂符號背景動畫 -->
+    <div class="music-notes">
+        <div class="note" style="left: 10%; animation-delay: 0s;">♪</div>
+        <div class="note" style="left: 20%; animation-delay: 2s;">♫</div>
+        <div class="note" style="left: 30%; animation-delay: 4s;">♪</div>
+        <div class="note" style="left: 40%; animation-delay: 6s;">♬</div>
+        <div class="note" style="left: 50%; animation-delay: 8s;">♪</div>
+        <div class="note" style="left: 60%; animation-delay: 10s;">♫</div>
+        <div class="note" style="left: 70%; animation-delay: 12s;">♪</div>
+        <div class="note" style="left: 80%; animation-delay: 14s;">♬</div>
+        <div class="note" style="left: 90%; animation-delay: 16s;">♪</div>
+    </div>
+
+    <div class="main-container">
+        <div class="container">
+            <div class="glass-card fade-in">
+                <!-- 頁面標題 -->
+                <h1 class="page-title">
+                    <i class="fas fa-edit title-icon"></i>
+                    編輯歌曲
+                </h1>
+                <p class="subtitle">
+                    <i class="fas fa-music"></i>
+                    修改你的音樂收藏資訊
+                </p>
+
+                @* <!-- 成功/錯誤訊息 --> *@
+                @* @if (TempData["message"] != null) *@
+                @* { *@
+                @*     <div class="success-message"> *@
+                @*         <i class="fas fa-check-circle"></i> *@
+                @*         @TempData["message"] *@
+                @*     </div> *@
+                @* } *@
+
+                <!-- 即時預覽區域 -->
+                <div class="preview-section" id="previewSection">
+                    <div id="previewCover" class="preview-no-cover">
+                        <i class="fas fa-music"></i>
+                    </div>
+                    <div class="preview-title" id="previewTitle">@Model.Title</div>
+                    <div class="preview-artist" id="previewArtist">@Model.Artist</div>
+                </div>
+
+                <!-- 表單 -->
+                <form asp-action="Edit" method="post" id="editForm">
+                    <div asp-validation-summary="ModelOnly" class="validation-summary">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        請修正以下錯誤：
+                    </div>
+
+                    <input type="hidden" asp-for="SongID" />
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="Title" class="form-label">
+                                    <i class="fas fa-music label-icon"></i>
+                                    歌曲名稱
+                                </label>
+                                <input asp-for="Title" class="form-control" placeholder="輸入歌曲名稱..." id="titleInput" />
+                                <span asp-validation-for="Title" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="Artist" class="form-label">
+                                    <i class="fas fa-microphone label-icon"></i>
+                                    演唱者/藝人
+                                </label>
+                                <input asp-for="Artist" class="form-control" placeholder="輸入演唱者名稱..." id="artistInput" />
+                                <span asp-validation-for="Artist" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="Album" class="form-label">
+                                    <i class="fas fa-compact-disc label-icon"></i>
+                                    專輯名稱
+                                </label>
+                                <input asp-for="Album" class="form-control" placeholder="輸入專輯名稱..." />
+                                <span asp-validation-for="Album" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="Genre" class="form-label">
+                                    <i class="fas fa-tags label-icon"></i>
+                                    音樂類型
+                                </label>
+                                <input asp-for="Genre" class="form-control" placeholder="例: 流行、搖滾、古典..." />
+                                <span asp-validation-for="Genre" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="Duration" class="form-label">
+                                    <i class="fas fa-clock label-icon"></i>
+                                    播放時長 (秒)
+                                </label>
+                                <input asp-for="Duration" class="form-control" type="number" min="1" placeholder="例: 240" />
+                                <span asp-validation-for="Duration" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="ReleaseYear" class="form-label">
+                                    <i class="fas fa-calendar-alt label-icon"></i>
+                                    發行年份
+                                </label>
+                                <input asp-for="ReleaseYear" class="form-control" type="number" min="1900" max="2030" placeholder="例: 2024" />
+                                <span asp-validation-for="ReleaseYear" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="ImageUrl" class="form-label">
+                            <i class="fas fa-image label-icon"></i>
+                            專輯封面圖片網址
+                        </label>
+                        <input asp-for="ImageUrl" class="form-control" type="text" placeholder="https://example.com/album-cover.jpg" id="imageUrlInput" />
+                        <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="CreatedDate" class="form-label">
+                            <i class="fas fa-plus-circle label-icon"></i>
+                            加入日期
+                        </label>
+                        <input asp-for="CreatedDate" class="form-control" type="datetime-local" />
+                        <span asp-validation-for="CreatedDate" class="text-danger"></span>
+                    </div>
+
+                    <!-- 按鈕區域 -->
+                    <div class="btn-container">
+                        <button type="submit" class="btn btn-music">
+                            <i class="fas fa-save"></i>
+                            儲存變更
+                        </button>
+                        <a asp-action="Index" class="btn-secondary">
+                            <i class="fas fa-arrow-left"></i>
+                            返回音樂庫
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // 表單提交動畫
+        document.getElementById('editForm').addEventListener('submit', function(e) {
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalContent = submitBtn.innerHTML;
+
+            // 設定載入狀態
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 儲存中...';
+            submitBtn.disabled = true;
+
+            // 如果表單驗證失敗，恢復按鈕狀態
+            setTimeout(() => {
+                const hasErrors = this.querySelector('.text-danger:not(:empty)') ||
+                                this.querySelector('.validation-summary ul li');
+
+                if (hasErrors) {
+                    submitBtn.innerHTML = originalContent;
+                    submitBtn.disabled = false;
+                }
+            }, 100);
+
+            // 如果 3 秒後還在同一頁面，說明有錯誤，恢復按鈕
+            const timeoutId = setTimeout(() => {
+                submitBtn.innerHTML = originalContent;
+                submitBtn.disabled = false;
+            }, 3000);
+
+            // 如果頁面成功跳轉，清除超時
+            window.addEventListener('beforeunload', () => {
+                clearTimeout(timeoutId);
+            }, { once: true });
+        });
+
+        // 即時預覽功能
+        function updatePreview() {
+            const titleInput = document.getElementById('titleInput');
+            const artistInput = document.getElementById('artistInput');
+            const imageUrlInput = document.getElementById('imageUrlInput');
+
+            const previewTitle = document.getElementById('previewTitle');
+            const previewArtist = document.getElementById('previewArtist');
+            const previewCover = document.getElementById('previewCover');
+
+            // 更新標題
+            if (titleInput && previewTitle) {
+                titleInput.addEventListener('input', function() {
+                    previewTitle.textContent = this.value || '歌曲名稱';
+                });
+            }
+
+            // 更新藝人
+            if (artistInput && previewArtist) {
+                artistInput.addEventListener('input', function() {
+                    previewArtist.textContent = this.value || '演唱者/藝人';
+                });
+            }
+
+            // 更新封面
+            if (imageUrlInput && previewCover) {
+                imageUrlInput.addEventListener('input', function() {
+                    const imageUrl = this.value.trim();
+                    if (imageUrl) {
+                        // 測試圖片是否有效
+                        const img = new Image();
+                        img.onload = function() {
+                            previewCover.innerHTML = '';
+                            previewCover.style.backgroundImage = `url(${imageUrl})`;
+                            previewCover.style.backgroundSize = 'cover';
+                            previewCover.style.backgroundPosition = 'center';
+                            previewCover.classList.remove('preview-no-cover');
+                            previewCover.classList.add('preview-cover');
+                        };
+                        img.onerror = function() {
+                            // 圖片載入失敗，恢復預設狀態
+                            previewCover.innerHTML = '<i class="fas fa-music"></i>';
+                            previewCover.style.backgroundImage = '';
+                            previewCover.classList.remove('preview-cover');
+                            previewCover.classList.add('preview-no-cover');
+                        };
+                        img.src = imageUrl;
+                    } else {
+                        // 沒有網址，顯示預設圖示
+                        previewCover.innerHTML = '<i class="fas fa-music"></i>';
+                        previewCover.style.backgroundImage = '';
+                        previewCover.classList.remove('preview-cover');
+                        previewCover.classList.add('preview-no-cover');
+                    }
+                });
+            }
+        }
+
+        // 音樂符號動畫隨機化
+        function randomizeNotes() {
+            const notes = document.querySelectorAll('.note');
+            notes.forEach(note => {
+                const randomDelay = Math.random() * 20;
+                note.style.animationDelay = randomDelay + 's';
+                note.style.left = Math.random() * 90 + '%';
+            });
+        }
+
+        // 頁面載入完成後執行
+        window.addEventListener('load', function() {
+            randomizeNotes();
+            updatePreview();
+
+            // 每30秒重新隨機化音樂符號位置
+            setInterval(randomizeNotes, 30000);
+        });
+
+        // 即時驗證反饋
+        document.querySelectorAll('.form-control').forEach(input => {
+            input.addEventListener('blur', function() {
+                if (this.value.trim() === '' && this.hasAttribute('required')) {
+                    this.style.borderColor = '#ff6b6b';
+                } else {
+                    this.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+                }
+            });
+
+            input.addEventListener('input', function() {
+                if (this.value.trim() !== '') {
+                    this.style.borderColor = '#2ecc71';
+
+                    // 清除相關的錯誤訊息
+                    const errorSpan = this.parentNode.querySelector('.text-danger');
+                    if (errorSpan) {
+                        errorSpan.textContent = '';
+                    }
+                }
+            });
+        });
+
+        // 初始化預覽封面
+        document.addEventListener('DOMContentLoaded', function() {
+            const imageUrlInput = document.getElementById('imageUrlInput');
+            const previewCover = document.getElementById('previewCover');
+
+            if (imageUrlInput && imageUrlInput.value && previewCover) {
+                const imageUrl = imageUrlInput.value.trim();
+                if (imageUrl) {
+                    const img = new Image();
+                    img.onload = function() {
+                        previewCover.innerHTML = '';
+                        previewCover.style.backgroundImage = `url(/images/${imageUrl})`;
+                        previewCover.style.backgroundSize = 'cover';
+                        previewCover.style.backgroundPosition = 'center';
+                        previewCover.classList.remove('preview-no-cover');
+                        previewCover.classList.add('preview-cover');
+                    };
+                    img.src = `/images/${imageUrl}`;
+                }
+            }
+        });
+    </script>
+
+    @section Scripts {
+        @{
+            await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        }
+    }
+</body>
+</html>

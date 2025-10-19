@@ -1,0 +1,769 @@
+﻿@model s1121735_Final_Project.Models.Songs
+@{
+    ViewData["Title"] = "刪除歌曲 - 我的音樂庫";
+}
+
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --danger-gradient: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+            --warning-gradient: linear-gradient(135deg, #ffa726 0%, #ff9800 100%);
+            --card-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            --glass-bg: rgba(255, 255, 255, 0.25);
+            --glass-border: rgba(255, 255, 255, 0.18);
+            --label-gradient: linear-gradient(135deg, #e6f3ff 0%, #ffffff 100%);
+        }
+
+        body {
+            background: var(--primary-gradient);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+        }
+
+            /* 動態背景 */
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+                z-index: -1;
+                animation: float 20s ease-in-out infinite;
+            }
+
+        @@keyframes float {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+
+            33% {
+                transform: translateY(-10px) rotate(1deg);
+            }
+
+            66% {
+                transform: translateY(5px) rotate(-1deg);
+            }
+        }
+
+        /* 音樂符號動畫 */
+        .music-notes {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .note {
+            position: absolute;
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.1);
+            animation: musicFloat 15s linear infinite;
+        }
+
+        @@keyframes musicFloat {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* 主要容器 */
+        .main-container {
+            padding: 2rem 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+
+        /* 玻璃效果卡片 */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: var(--card-shadow);
+            padding: 0rem 3rem 3rem 3rem;
+            margin: 2rem auto;
+            max-width: 800px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+            .glass-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 30px 60px rgba(0,0,0,0.15);
+            }
+
+            .glass-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 2px;
+                background: var(--danger-gradient);
+            }
+
+        /* 標題樣式 */
+        .page-title {
+            text-align: center;
+            margin-bottom: 1rem;
+            background: var(--label-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+            font-size: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .title-icon {
+            font-size: 3.5rem;
+            color: #ff6b6b;
+            animation: pulse 2s ease-in-out infinite;
+            margin-bottom: 0.5rem;
+        }
+
+        @@keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        /* 警告區域 */
+        .warning-section {
+            background: linear-gradient(135deg, rgba(255, 167, 38, 0.1) 0%, rgba(255, 152, 0, 0.1) 100%);
+            border: 2px solid rgba(255, 167, 38, 0.3);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            animation: shake 2s ease-in-out infinite;
+        }
+
+        @@keyframes shake {
+            0%, 100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-2px);
+            }
+
+            75% {
+                transform: translateX(2px);
+            }
+        }
+
+        .warning-icon {
+            font-size: 2.5rem;
+            color: #ffa726;
+            margin-bottom: 1rem;
+        }
+
+        .warning-title {
+            color: #ffa726;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .warning-text {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+        }
+
+        /* 歌曲展示區域 */
+        .song-display {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .album-cover-section {
+            flex-shrink: 0;
+        }
+
+        .album-cover {
+            width: 150px;
+            height: 150px;
+            border-radius: 15px;
+            object-fit: cover;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            border: 3px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .no-cover {
+            width: 150px;
+            height: 150px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: rgba(255, 255, 255, 0.5);
+            border: 3px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .song-info {
+            flex: 1;
+        }
+
+        .song-title {
+            color: white;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .song-artist {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+
+        .song-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .detail-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.8rem;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .detail-label {
+            color: #e6f3ff;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .label-icon {
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .detail-value {
+            color: white;
+            font-weight: 500;
+        }
+
+        /* 按鈕樣式 */
+        .btn-container {
+            text-align: center;
+            margin-top: 2rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-danger {
+            background: var(--danger-gradient);
+            border: none;
+            color: white;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-width: 180px;
+            animation: dangerPulse 3s ease-in-out infinite;
+        }
+
+        @@keyframes dangerPulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7);
+            }
+
+            50% {
+                box-shadow: 0 0 0 10px rgba(255, 107, 107, 0);
+            }
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 30px rgba(255, 107, 107, 0.4);
+            color: white;
+        }
+
+        .btn-danger::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-danger:hover::before {
+            left: 100%;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+            .btn-secondary:hover {
+                background: rgba(255, 255, 255, 0.3);
+                color: white;
+                text-decoration: none;
+                transform: translateY(-2px);
+            }
+
+        .btn-safe {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+            .btn-safe:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 25px rgba(46, 204, 113, 0.4);
+                color: white;
+                text-decoration: none;
+            }
+
+        /* 響應式設計 */
+        @@media (max-width: 768px) {
+            .glass-card {
+                margin: 1rem;
+                padding: 2rem 1.5rem;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .song-display {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .song-details {
+                grid-template-columns: 1fr;
+            }
+
+            .btn-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .album-cover,
+            .no-cover {
+                width: 120px;
+                height: 120px;
+            }
+
+            .song-title {
+                font-size: 1.5rem;
+            }
+
+            .song-artist {
+                font-size: 1.1rem;
+            }
+        }
+
+        /* 載入動畫 */
+        .fade-in {
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 確認對話框樣式 */
+        .confirmation-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .confirmation-dialog {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 400px;
+            text-align: center;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @@keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .confirmation-icon {
+            font-size: 3rem;
+            color: #ff6b6b;
+            margin-bottom: 1rem;
+        }
+
+        .confirmation-title {
+            color: white;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .confirmation-text {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 1.5rem;
+        }
+
+        .confirmation-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- 音樂符號背景動畫 -->
+    <div class="music-notes">
+        <div class="note" style="left: 10%; animation-delay: 0s;">♪</div>
+        <div class="note" style="left: 20%; animation-delay: 2s;">♫</div>
+        <div class="note" style="left: 30%; animation-delay: 4s;">♪</div>
+        <div class="note" style="left: 40%; animation-delay: 6s;">♬</div>
+        <div class="note" style="left: 50%; animation-delay: 8s;">♪</div>
+        <div class="note" style="left: 60%; animation-delay: 10s;">♫</div>
+        <div class="note" style="left: 70%; animation-delay: 12s;">♪</div>
+        <div class="note" style="left: 80%; animation-delay: 14s;">♬</div>
+        <div class="note" style="left: 90%; animation-delay: 16s;">♪</div>
+    </div>
+
+    <!-- 確認對話框 -->
+    <div class="confirmation-overlay" id="confirmationOverlay">
+        <div class="confirmation-dialog">
+            <i class="fas fa-exclamation-triangle confirmation-icon"></i>
+            <div class="confirmation-title">確認刪除歌曲</div>
+            <div class="confirmation-text">此操作無法復原，確定要永久刪除這首歌曲嗎？</div>
+            <div class="confirmation-buttons">
+                <button class="btn-danger" onclick="confirmDelete()">
+                    <i class="fas fa-trash"></i>
+                    確認刪除
+                </button>
+                <button class="btn-secondary" onclick="cancelDelete()">
+                    <i class="fas fa-times"></i>
+                    取消
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="container">
+            <div class="glass-card fade-in">
+                <!-- 頁面標題 -->
+                <h1 class="page-title">
+                    <i class="fas fa-trash-alt title-icon"></i>
+                    刪除歌曲
+                </h1>
+                <p class="subtitle">
+                    <i class="fas fa-exclamation-circle"></i>
+                    請確認要刪除的歌曲資訊
+                </p>
+
+                <!-- 警告區域 -->
+                <div class="warning-section">
+                    <i class="fas fa-exclamation-triangle warning-icon"></i>
+                    <div class="warning-title">⚠️ 注意：此操作無法復原</div>
+                    <div class="warning-text">刪除後將永久移除此歌曲的所有資訊，請謹慎操作</div>
+                </div>
+
+                <!-- 歌曲展示區域 -->
+                <div class="song-display">
+                    <div class="album-cover-section">
+                        @if (!string.IsNullOrEmpty(Model?.ImageUrl))
+                        {
+                            <img src="/images/@Model.ImageUrl" alt="@Model.Title 專輯封面" class="album-cover"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                            <div class="no-cover" style="display: none;">
+                                <i class="fas fa-music"></i>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="no-cover">
+                                <i class="fas fa-music"></i>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="song-info">
+                        <div class="song-title">@Html.DisplayFor(model => model.Title)</div>
+                        <div class="song-artist">@Html.DisplayFor(model => model.Artist)</div>
+
+                        <div class="song-details">
+                            <div class="detail-item">
+                                <div class="detail-label">
+                                    <i class="fas fa-compact-disc label-icon"></i>
+                                    專輯
+                                </div>
+                                <div class="detail-value">@Html.DisplayFor(model => model.Album)</div>
+                            </div>
+
+                            <div class="detail-item">
+                                <div class="detail-label">
+                                    <i class="fas fa-tags label-icon"></i>
+                                    類型
+                                </div>
+                                <div class="detail-value">@Html.DisplayFor(model => model.Genre)</div>
+                            </div>
+
+                            <div class="detail-item">
+                                <div class="detail-label">
+                                    <i class="fas fa-clock label-icon"></i>
+                                    時長
+                                </div>
+                                <div class="detail-value">
+                                    <span id="duration">@Html.DisplayFor(model => model.Duration) 秒</span>
+                                </div>
+                            </div>
+
+                            <div class="detail-item">
+                                <div class="detail-label">
+                                    <i class="fas fa-calendar-alt label-icon"></i>
+                                    發行年份
+                                </div>
+                                <div class="detail-value">@Html.DisplayFor(model => model.ReleaseYear)</div>
+                            </div>
+
+                            <div class="detail-item">
+                                <div class="detail-label">
+                                    <i class="fas fa-plus-circle label-icon"></i>
+                                    加入日期
+                                </div>
+                                <div class="detail-value">@Html.DisplayFor(model => model.CreatedDate)</div>
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(Model?.ImageUrl))
+                            {
+                                <div class="detail-item">
+                                    <div class="detail-label">
+                                        <i class="fas fa-image label-icon"></i>
+                                        封面
+                                    </div>
+                                    <div class="detail-value" style="font-size: 0.8rem; opacity: 0.7;">
+                                        @Html.DisplayFor(model => model.ImageUrl)
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 隱藏的刪除表單 -->
+                <form asp-action="Delete" method="post" id="deleteForm" style="display: none;">
+                    <input type="hidden" asp-for="SongID" />
+                </form>
+
+                <!-- 按鈕區域 -->
+                <div class="btn-container">
+                    <button type="button" class="btn-danger" onclick="showConfirmation()">
+                        <i class="fas fa-trash-alt"></i>
+                        永久刪除歌曲
+                    </button>
+                    <a asp-action="Index" class="btn-secondary">
+                        <i class="fas fa-arrow-left"></i>
+                        返回音樂庫
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // 顯示確認對話框
+        function showConfirmation() {
+            document.getElementById('confirmationOverlay').style.display = 'flex';
+        }
+
+        // 取消刪除
+        function cancelDelete() {
+            document.getElementById('confirmationOverlay').style.display = 'none';
+        }
+
+        // 確認刪除
+        function confirmDelete() {
+            const deleteBtn = document.querySelector('.confirmation-dialog .btn-danger');
+            deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 刪除中...';
+            deleteBtn.disabled = true;
+
+            // 提交表單
+            setTimeout(() => {
+                document.getElementById('deleteForm').submit();
+            }, 1000);
+        }
+
+        // 點擊遮罩層關閉對話框
+        document.getElementById('confirmationOverlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                cancelDelete();
+            }
+        });
+
+        // ESC 鍵關閉對話框
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                cancelDelete();
+            }
+        });
+
+        // 格式化時長顯示
+        function formatDuration() {
+            const durationElement = document.getElementById('duration');
+            if (durationElement) {
+                const seconds = parseInt(durationElement.textContent);
+                if (!isNaN(seconds)) {
+                    const minutes = Math.floor(seconds / 60);
+                    const remainingSeconds = seconds % 60;
+                    const formattedTime = `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+                    durationElement.innerHTML = `${formattedTime} <small>(${seconds} 秒)</small>`;
+                }
+            }
+        }
+
+        // 音樂符號動畫隨機化
+        function randomizeNotes() {
+            const notes = document.querySelectorAll('.note');
+            notes.forEach(note => {
+                const randomDelay = Math.random() * 20;
+                note.style.animationDelay = randomDelay + 's';
+                note.style.left = Math.random() * 90 + '%';
+            });
+        }
+
+        // 頁面載入完成後執行
+        window.addEventListener('load', function() {
+            randomizeNotes();
+            formatDuration();
+
+            // 每30秒重新隨機化音樂符號位置
+            setInterval(randomizeNotes, 30000);
+        });
+
+        // 專輯封面載入錯誤處理
+        document.addEventListener('DOMContentLoaded', function() {
+            const albumCover = document.querySelector('.album-cover');
+            if (albumCover) {
+                albumCover.addEventListener('error', function() {
+                    this.style.display = 'none';
+                    const noCover = this.nextElementSibling;
+                    if (noCover) {
+                        noCover.style.display = 'flex';
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
