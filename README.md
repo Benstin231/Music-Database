@@ -1,4 +1,4 @@
-# 🎵 音樂資料庫管理系統 (Music Database Management System)
+# 🎵 音樂資料庫管理系統
 
 一個基於 ASP.NET Core MVC 8.0 開發的音樂收藏管理系統,提供完整的 CRUD 功能與優雅的使用者介面。
 
