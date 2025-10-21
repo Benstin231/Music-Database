@@ -1,0 +1,74 @@
+## ASP.NET Core
+bin/
+obj/
+*.user
+*.suo
+*.cache
+
+## Configuration files with sensitive data
+appsettings.json
+appsettings.Development.json
+appsettings.Production.json
+appsettings.*.json
+!appsettings.example.json
+
+## User secrets
+secrets.json
+
+## Environment files
+.env
+.env.local
+.env.*.local
+
+## Database
+*.db
+*.db-shm
+*.db-wal
+
+## IDE
+.vs/
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+## Keys and certificates
+*.pfx
+*.key
+*.pem
+*.p12
+*.cer
+
+## Logs
+logs/
+*.log
+
+## Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+
+## NuGet
+*.nupkg
+*.snupkg
+**/packages/*
+!**/packages/build/
+
+## Test results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+## Azure
+*.pubxml
+*.azurePubxml
+PublishScripts/
+
+## macOS
+.DS_Store
